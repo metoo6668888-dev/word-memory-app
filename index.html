@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>单词砍砍乐 · 艾宾浩斯复习</title>
+<meta name="theme-color" content="#4f46e5" />
+<meta name="description" content="自定义英语词库、英中双向记忆、艾宾浩斯复习、熟练砍掉与智能词条生成。" />
+<link rel="manifest" href="./manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="单词砍砍乐" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="format-detection" content="telephone=no" />
+<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="brand"><h1>📚 单词砍砍乐</h1><p>自定义词库 · 自定义复习计划 · 英中双向遮挡记忆 · 熟练后“砍掉”</p></div><div class="pill">数据仅保存在本机浏览器</div></div>
+
+  <div class="installbar" id="installBar">
+    <div class="installcopy"><b id="installTitle">📲 安装到手机 / iPad / 安卓平板</b><span id="installDesc">安装后可从桌面图标直接启动，以独立 App 窗口运行，不显示浏览器地址栏。</span><div class="install-tip install-hidden" id="installTip"></div></div>
+    <div class="install-actions"><span class="standalone-badge install-hidden" id="installedBadge">✓ 已以 App 模式运行</span><button class="btn primary" id="installBtn" type="button">安装应用</button><button class="btn ghost install-hidden" id="installHelpBtn" type="button">查看安装方法</button></div>
+  </div>
+
+  <div class="grid">
+    <div class="stat"><div class="l">词库总数</div><div class="n" id="sTotal">0</div></div>
+    <div class="stat"><div class="l">今日待复习</div><div class="n" id="sDue">0</div></div>
+    <div class="stat"><div class="l">学习中</div><div class="n" id="sLearning">0</div></div>
+    <div class="stat"><div class="l">已完全掌握</div><div class="n" id="sMastered">0</div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" data-tab="today">今日学习</button>
+    <button class="tab" data-tab="add">录入单词</button>
+    <button class="tab" data-tab="words">我的词库</button>
+    <button class="tab" data-tab="plan">复习计划</button>
+    <button class="tab" data-tab="data">数据备份</button>
+  </div>
+
+  <section class="panel active" id="today">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+        <div><h2 style="margin-bottom:6px">今日任务</h2><div class="notice" id="todayNote">正在准备...</div></div>
+        <div style="min-width:220px;flex:1;max-width:430px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-bottom:7px"><span>今日完成度</span><span id="progressText">0 / 0</span></div><div class="progress"><div id="progressBar"></div></div></div>
+      </div>
+    </div>
+
+    <div class="card studybox" id="studyCard">
+      <div class="modebar" id="modeBar">
+        <span class="mode-label">遮挡 / 背诵方式</span>
+        <button class="modebtn" type="button" data-study-mode="mixed">↔ 双向智能</button>
+        <button class="modebtn" type="button" data-study-mode="en2zh">隐藏中文 · 看英背中</button>
+        <button class="modebtn" type="button" data-study-mode="zh2en">隐藏英文 · 看中背英</button>
+      </div>
+      <div class="direction" id="direction">英 → 中</div>
+      <div class="prompt" id="prompt">今天没有到期单词 🎉</div>
+      <div class="subprompt" id="subprompt">可以去“录入单词”添加新词。</div>
+      <div class="typing" id="typingBox" style="display:none"><input id="typingInput" placeholder="请输入英文单词" autocomplete="off" /><div id="typingFeedback" class="feedback"></div></div>
+      <div class="answer" id="answer"></div>
+      <div class="study-actions" id="preActions">
+        <button class="btn primary" id="revealBtn">显示答案</button>
+      </div>
+      <div class="study-actions" id="postActions" style="display:none">
+        <button class="btn bad" data-grade="again">没记住 · 继续背</button>
+        <button class="btn warn" data-grade="hard">有点模糊</button>
+        <button class="btn ok" data-grade="good">记住了</button>
+        <button class="btn secondary" data-grade="easy">很熟练 · 砍掉</button>
+      </div>
+      <div class="keyboard">快捷键：空格显示答案；1 没记住；2 模糊；3 记住；4 熟练砍掉</div>
+    </div>
+  </section>
+
+  <section class="panel" id="add">
+    <div class="split">
+      <div class="card">
+        <h2>单个录入 · 智能生成词条</h2>
+        <div class="notice"><b>只输入英文即可。</b>系统会自动补全音标、词性、常用中文释义和英文例句；联网生成完成后再进入你的词库。</div>
+        <div class="field" style="margin-top:12px"><label>英文单词 / 短语</label><input id="wordEn" placeholder="例如：abandon" /></div>
+        <div class="actions"><button class="btn primary" id="autoOne">✨ 自动生成并加入词库</button><button class="btn ghost" id="speakNew">🔊 朗读英文</button></div>
+        <div id="oneStatus" class="notice" style="display:none;margin-top:12px"></div>
+        <details style="margin-top:14px"><summary style="cursor:pointer;font-weight:700;color:#4b5563">需要时手动录入 / 修改</summary>
+          <div class="field" style="margin-top:12px"><label>中文释义</label><input id="wordZh" placeholder="例如：放弃；抛弃" /></div>
+          <div class="field" style="margin-top:12px"><label>例句（可选）</label><textarea id="wordExample" placeholder="例如：They had to abandon the plan."></textarea></div>
+          <div class="actions"><button class="btn secondary" id="addOne">按手动内容加入词库</button></div>
+        </details>
+      </div>
+      <div class="card">
+        <h2>批量导入 · 自动生成完整词条</h2>
+        <div class="notice"><b>只需要英文。</b>每行一个单词或短语，系统会自动获取词典信息并生成：<b>音标 + 词性 + 常用中文释义 + 英文例句 + 例句中文</b>。也可以上传 TXT / CSV。<br><span style="font-size:12px;color:var(--muted)">智能生成需要联网；导入完成后的背诵、砍词和艾宾浩斯复习仍保存在本机。</span></div>
+        <div class="field" style="margin-top:12px"><label>英文单词 / 短语列表</label><textarea id="batchText" style="min-height:210px" placeholder="abandon
+accurate
+benefit
+challenge"></textarea></div>
+        <div class="actions">
+          <button class="btn primary" id="addBatch">✨ 生成完整词条并加入词库</button>
+          <label class="btn secondary" style="display:inline-flex;align-items:center;cursor:pointer">📄 导入 TXT / CSV<input type="file" id="batchFile" accept=".txt,.csv,text/plain,text/csv" style="display:none"></label>
+          <button class="btn ghost" id="loadSample">填入示例</button>
+        </div>
+        <div id="batchStatus" class="notice" style="display:none;margin-top:12px"></div>
+        <div id="batchFailures" style="display:none;margin-top:12px">
+          <div class="field"><label>未成功导入的单词（可稍后重试）</label><textarea id="failedWords" style="min-height:100px" readonly></textarea></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="words">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:end">
+        <div><h2>我的词库</h2><div class="notice">“砍掉”表示你认为这个词已经比较熟练，系统会减少出现频率，但仍继续安排长期巩固；最后一次周期复习成功后才进入“完全掌握”。</div></div>
+        <div style="display:flex;gap:8px;align-items:end;flex-wrap:wrap"><div class="field" style="min-width:260px"><label>搜索</label><input id="searchWord" placeholder="输入英文或中文" /></div><button class="btn secondary" id="enrichLegacy">✨ 补全旧词资料</button></div>
+      </div>
+      <div id="enrichStatus" class="notice" style="display:none;margin-top:12px"></div>
+      <div class="tablewrap" style="margin-top:12px"><table class="table"><thead><tr><th>英文 · 例句</th><th>词性 · 常用释义</th><th>状态</th><th>记忆阶段</th><th>下次复习</th><th>操作</th></tr></thead><tbody id="wordRows"></tbody></table></div>
+    </div>
+  </section>
+
+  <section class="panel" id="plan">
+    <div class="card">
+      <h2>我的复习计划</h2>
+      <div class="notice">你可以完全自定义每一阶段的复习间隔。系统会根据“没记住 / 模糊 / 记住 / 熟练”自动退阶或进阶；在“双向智能”模式下，还会优先考你更薄弱的方向。</div>
+      <div class="actions">
+        <button class="btn ghost plan-preset" data-preset="classic">经典艾宾浩斯</button>
+        <button class="btn ghost plan-preset" data-preset="intensive">强化记忆</button>
+        <button class="btn ghost plan-preset" data-preset="light">轻量长期</button>
+      </div>
+      <div class="plan-builder" id="planRows"></div>
+      <div class="actions"><button class="btn secondary" id="addPlanStage">＋ 添加阶段</button></div>
+      <div class="row" style="margin-top:14px">
+        <div class="field"><label>每日学习总上限（0 = 不限制）</label><input id="dailyLimit" type="number" min="0" step="1" placeholder="例如 50" /></div>
+        <div class="field"><label>每日新词上限（0 = 不限制）</label><input id="newDailyLimit" type="number" min="0" step="1" placeholder="例如 20" /></div>
+      </div>
+      <div class="checkrow" style="margin-top:12px"><input id="requireBothDirections" type="checkbox" /><div><b>双向智能模式：同一阶段两边都记住才进阶</b><div class="tiny" style="margin-top:4px">例如先“看英文背中文”答对后，系统会在本轮再次安排“看中文背英文”；两边都通过后，才进入下一复习阶段。这样更适合深度记忆。</div></div></div>
+      <div class="actions"><button class="btn primary" id="savePlan">保存计划</button><button class="btn secondary" id="savePlanReflow">保存并按新计划重排未掌握单词</button></div>
+      <div id="planStatus" class="notice" style="display:none;margin-top:12px"></div>
+      <div class="plan-summary" id="scheduleChips"></div>
+    </div>
+    <div class="card">
+      <h2>记忆判定规则</h2>
+      <div class="row">
+        <div class="notice"><b>没记住</b><br>退回第 1 阶段，并按你自定义的第 1 个间隔再次复习。</div>
+        <div class="notice"><b>有点模糊</b><br>适当退阶，并缩短下一次复习时间。</div>
+        <div class="notice"><b>记住了</b><br>达到本阶段要求后进入下一阶段。</div>
+        <div class="notice"><b>很熟练 · 砍掉</b><br>达到本阶段要求后快速前进 2 个阶段；最终阶段完成后标记为完全掌握。</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="data">
+    <div class="card">
+      <h2>备份与迁移</h2>
+      <div class="notice">建议每周导出一次 JSON 备份。如果换电脑或清理浏览器缓存，可通过备份恢复全部单词和学习进度。</div>
+      <div class="actions"><button class="btn primary" id="exportJson">导出 JSON 备份</button><button class="btn secondary" id="exportCsv">导出 CSV 词库</button><label class="btn ghost" style="display:inline-flex;align-items:center;cursor:pointer">导入 JSON<input type="file" id="importJson" accept="application/json" style="display:none"></label></div>
+    </div>
+    <div class="card dangerzone">
+      <h2>重置</h2><div class="notice">此操作会清空本机全部单词与学习记录。</div><div class="actions"><button class="btn bad" id="resetAll">清空全部数据</button></div>
+    </div>
+  </section>
+
+  <div class="foot">学习复习可离线 · 可自定义复习节奏与双向遮挡模式 · 智能词条生成需联网 · 安装后独立 App 模式运行</div>
+</div>
+<script src="./app.js"></script>
+
+</body>
+</html>
